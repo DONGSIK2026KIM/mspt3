@@ -49,8 +49,8 @@ ip-172-31-23-60   121m         6%     1921Mi          49%
 
 이제 준비가 됐으면, 다음 명령어를 실행하여 간단한 테스트용 Pod 를 준비합니다.
 ```yaml
-ubuntu@ip-172-31-23-60:~$ kubectl apply -f https://k8s.io/examples/application/php-apache.yaml
-deployment.apps/php-apache created
+ubuntu@ip-172-31-23-60:~$ kubectl apply -f https://k8s.io/examples/application/inference.yaml
+deployment.apps/inference created
 service/php-apache created
 ```
 
@@ -67,8 +67,8 @@ service/php-apache created
 명령어는 다음과 같습니다.  
 CPU 사용량을 50%로 유지하기 위해서 Pod의 개수를 1 에서 10 사이로 조정하라는 의미입니다.
 ```bash
-ubuntu@ip-172-31-36-162:~$ kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10
-horizontalpodautoscaler.autoscaling/php-apache autoscaled
+ubuntu@ip-172-31-36-162:~$ kubectl autoscale deployment inference --cpu-percent=50 --min=1 --max=10
+horizontalpodautoscaler.autoscaling/inference autoscaled
 ```
 
 > 💻 명령어
@@ -80,9 +80,9 @@ horizontalpodautoscaler.autoscaling/php-apache autoscaled
 
 잘 만들어졌나 볼까요?
 ```bash
-ubuntu@ip-172-31-23-60:~$ kubectl get hpa
+ubuntu@ip-172-31-36-162:~$ kubectl get hpa
 NAME         REFERENCE               TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
-php-apache   Deployment/php-apache   <unknown>/50%   1         10        1          27s
+inference   Deployment/inference   <unknown>/50%   1         10        1          27s
 ```
 
 > 💻 명령어
@@ -100,7 +100,7 @@ php-apache   Deployment/php-apache   <unknown>/50%   1         10        1      
 시스템에 사용자가 늘어난 상황을 비슷하게 만든거라고 보시면 됩니다.
 
 ```bash
-ubuntu@ip-172-31-23-60:~$ kubectl run -it load-generator --rm --image=busybox --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-apache; done"
+ubuntu@ip-172-31-36-162:~$ kubectl run -it load-generator --rm --image=busybox --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://inference; done"
 If you don't see a command prompt, try pressing enter.
 OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!
 ```
@@ -115,10 +115,10 @@ OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK
 이제 터미널을 더 열고 아래 명령어를 실행해서 어떤 변화가 있는지 알아봅니다.  
 가능하면 두 개의 터미널을 더 열어두고 아래 두 가지를 같이 확인해보면 좋습니다.
 ```bash
-Every 1.0s: kubectl get hpa                             ip-172-31-28-216: Mon Mar  6 13:15:05 2023
+Every 1.0s: kubectl get hpa                             ip-172-31-36-162: Mon August  6 13:15:05 2023
 
 NAME         REFERENCE               TARGETS    MINPODS   MAXPODS   REPLICAS   AGE
-php-apache   Deployment/php-apache   71%/50%   1         10        6          4m13s
+inference   Deployment/inference   71%/50%   1         10        6          4m13s
 ```
 
 > 💻 명령어 (Terminal 2)
@@ -132,12 +132,12 @@ php-apache   Deployment/php-apache   71%/50%   1         10        6          4m
 ```bash
 Every 1.0s: kubectl top pod                             ip-172-31-28-216: Mon Mar  6 13:15:05 2023
 
-NAME                          CPU(cores)   MEMORY(bytes)
+NAME                       CPU(cores)   MEMORY(bytes)
 load-generator                8m           0Mi
-php-apache-7d665c4ddf-2b8rf   122m         11Mi
-php-apache-7d665c4ddf-5r24h   121m         11Mi
-php-apache-7d665c4ddf-cxbhb   172m         11Mi
-php-apache-7d665c4ddf-l6lmv   158m         11Mi
+inference-7d665c4ddf-2b8rf   122m         11Mi
+inference-7d665c4ddf-5r24h   121m         11Mi
+inference-7d665c4ddf-cxbhb   172m         11Mi
+inference-7d665c4ddf-l6lmv   158m         11Mi
 ```
 
 > 💻 명령어 (Terminal 3)
